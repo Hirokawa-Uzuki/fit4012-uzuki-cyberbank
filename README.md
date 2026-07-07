@@ -37,8 +37,8 @@ Hệ thống tích hợp 7 chốt chặn bảo mật tương ứng với 7 kịc
 4. Nhấn **F5** để biên dịch và khởi chạy máy chủ mô phỏng.
 
 ## 🎥 Video Demo & Báo cáo
-* **Báo cáo kỹ thuật:** Xem file PDF tại thư mục `/docs/`.
-* **Video Demo:** [Chèn link YouTube của nhóm vào đây]
+* **Báo cáo kỹ thuật:** Xem file PDF tại https://drive.google.com/file/d/1Ax4E_HKu3FCimPdH5spACCFQ7Oxhx37N/view?usp=sharing.
+* **Video Demo:** https://drive.google.com/drive/folders/1Tr3anq5El66LwqFmriqjBaIMJzccFepu?usp=sharing
 
 ---
 *Dự án được xây dựng hoàn toàn từ đầu (from scratch), không sử dụng lại mã nguồn cũ, cam kết tuân thủ các quy chuẩn khắt khe nhất về An toàn thông tin.*
