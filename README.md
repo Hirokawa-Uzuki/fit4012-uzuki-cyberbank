@@ -3,14 +3,14 @@
 Chào mừng đến với **CyberBank Security Game v2** - Đồ án Trình giả lập An ninh mạng tương tác thời gian thực. Dự án thuộc học phần FIT4012 - Nhập môn An toàn bảo mật thông tin (Năm học 2025-2026), Trường Đại học Đại Nam.
 
 ### 👥 Đội ngũ Phát triển (Nhóm 15)
-* **Nguyễn Ngọc Quyết (Leader)** - Kiến trúc Mật mã & Backend[cite: 4]
-* **Phạm Đăng Quốc Dũng** - Thiết kế Giao thức & Frontend[cite: 4]
-* **Lê Vũ Đình** - Kịch bản Bảo mật & QA Tester[cite: 4]
+* **Nguyễn Ngọc Quyết (Leader)** - Kiến trúc Mật mã & Backend
+* **Phạm Đăng Quốc Dũng** - Thiết kế Giao thức & Frontend
+* **Lê Vũ Đình** - Kịch bản Bảo mật & QA Tester
 
 ---
 
 ## 🎯 Mục tiêu Dự án
-Dự án được xây dựng theo định hướng **Secure System Upgrade Challenge**, không chỉ cài đặt các thuật toán mật mã khô khan mà trực quan hóa chúng thông qua phong cách Gamification (Game hóa)[cite: 3]. Người dùng sẽ đóng vai Hacker thực hiện các cuộc tấn công mạng để kiểm chứng sức mạnh của kiến trúc phòng thủ đa tầng (Defense in Depth) do Nhóm 15 thiết kế.
+Dự án được xây dựng theo định hướng **Secure System Upgrade Challenge**, không chỉ cài đặt các thuật toán mật mã khô khan mà trực quan hóa chúng thông qua phong cách Gamification (Game hóa). Người dùng sẽ đóng vai Hacker thực hiện các cuộc tấn công mạng để kiểm chứng sức mạnh của kiến trúc phòng thủ đa tầng (Defense in Depth) do Nhóm 15 thiết kế.
 
 ## ⚔️ 7 Cấp độ Tấn công & Phòng thủ (Features)
 Hệ thống tích hợp 7 chốt chặn bảo mật tương ứng với 7 kịch bản đe dọa (Threat Models) thực tế:
