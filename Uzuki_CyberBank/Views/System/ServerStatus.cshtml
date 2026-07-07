@@ -1,0 +1,268 @@
+﻿@{
+    ViewData["Title"] = "Server Status Node";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .status-card {
+    background: rgba(11, 12, 16, 0.85);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 8px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .status-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00f3ff, transparent);
+    animation: scanline 2s linear infinite;
+    }
+
+    @@keyframes scanline {
+    0% {
+    transform: translateX(-100%);
+    }
+
+    100% {
+    transform: translateX(100%);
+    }
+    }
+
+    .stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #00f3ff;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+
+    .blinking-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #4af626;
+    border-radius: 50%;
+    display: inline-block;
+    animation: blink 1s infinite;
+    box-shadow: 0 0 8px #4af626;
+    }
+
+    @@keyframes blink {
+    0%, 100% {
+    opacity: 1;
+    }
+
+    50% {
+    opacity: 0.3;
+    }
+    }
+
+    .progress-cyber {
+    height: 15px;
+    background-color: #1f2833;
+    border: 1px solid #00f3ff;
+    border-radius: 0;
+    }
+
+    .progress-bar-cyber {
+    background-color: #00f3ff;
+    box-shadow: 0 0 10px #00f3ff;
+    transition: width 0.5s ease;
+    }
+
+    /* Màn hình terminal chạy code ảo */
+    .matrix-terminal {
+    background: #050505;
+    border: 1px solid #4af626;
+    color: #4af626;
+    font-family: monospace;
+    font-size: 0.8rem;
+    height: 150px;
+    overflow: hidden;
+    padding: 10px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-info pb-2">
+        <h3 class="text-info" style="font-family: 'Orbitron', sans-serif;">
+            <i class="fa-solid fa-server me-2"></i> INFRASTRUCTURE METRICS
+        </h3>
+        <div>
+            <span class="text-light me-3"><span class="blinking-dot me-2"></span>Node: UZUKI_CORE_MASTER</span>
+            <span class="text-muted font-monospace">UPTIME: 99.99%</span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="status-card text-center">
+                <p class="text-muted text-uppercase fw-bold mb-1"><i class="fa-solid fa-users me-2"></i>Total Users</p>
+                <div class="stat-value">@ViewBag.TotalUsers</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="status-card text-center" style="border-color: #bc13fe;">
+                <p class="text-muted text-uppercase fw-bold mb-1"><i class="fa-solid fa-money-bill-transfer me-2"></i>Transactions</p>
+                <div class="stat-value" style="color: #bc13fe; text-shadow: 0 0 10px #bc13fe;">@ViewBag.TotalTx</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="status-card text-center" style="border-color: #4af626;">
+                <p class="text-muted text-uppercase fw-bold mb-1"><i class="fa-solid fa-shield-virus me-2"></i>Threats Blocked</p>
+                <div class="stat-value" style="color: #4af626; text-shadow: 0 0 10px #4af626;">@ViewBag.ThreatsBlocked</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="status-card">
+                <h6 class="text-info fw-bold mb-3"><i class="fa-solid fa-network-wired me-2"></i>LIVE NETWORK I/O (MB/s)</h6>
+                <canvas id="networkChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="status-card">
+                <h6 class="text-warning fw-bold mb-4"><i class="fa-solid fa-microchip me-2"></i>HARDWARE STRESS</h6>
+
+                <p class="text-light small mb-1 d-flex justify-content-between">
+                    <span>CPU Core i5-13420H Usage</span> <span id="cpuText" class="text-info">24%</span>
+                </p>
+                <div class="progress progress-cyber mb-4">
+                    <div id="cpuBar" class="progress-bar progress-bar-cyber" style="width: 24%"></div>
+                </div>
+
+                <p class="text-light small mb-1 d-flex justify-content-between">
+                    <span>RAM Allocation (16GB)</span> <span id="ramText" class="text-warning">45%</span>
+                </p>
+                <div class="progress progress-cyber mb-4">
+                    <div id="ramBar" class="progress-bar progress-bar-cyber bg-warning shadow-none" style="width: 45%; border-color: #ffd700;"></div>
+                </div>
+
+                <p class="text-light small mb-1 d-flex justify-content-between">
+                    <span>NVIDIA RTX 3050 Crypto Load</span> <span id="gpuText" class="text-danger">78%</span>
+                </p>
+                <div class="progress progress-cyber">
+                    <div id="gpuBar" class="progress-bar progress-bar-cyber bg-danger shadow-none" style="width: 78%; border-color: #ff003c;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="status-card p-0" style="border-color: #4af626;">
+                <div class="bg-dark text-success p-2 small fw-bold border-bottom border-success">
+                    <i class="fa-solid fa-terminal me-2"></i> SYSTEM_PROCESS_STREAMS
+                </div>
+                <div class="matrix-terminal" id="matrixConsole">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+    // 1. Vẽ Biểu đồ Line Chart cho Network Traffic
+    const ctx = document.getElementById('networkChart').getContext('2d');
+    const networkChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+    labels: ['-50s', '-45s', '-40s', '-35s', '-30s', '-25s', '-20s', '-15s', '-10s', '-5s', 'Now'],
+    datasets: [{
+    label: 'Inbound Traffic (Encrypted)',
+    data: [12, 19, 15, 25, 22, 30, 28, 35, 20, 15, 25],
+    borderColor: '#00f3ff',
+    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+    borderWidth: 2,
+    fill: true,
+    tension: 0.4
+    },
+    {
+    label: 'Outbound Traffic',
+    data: [8, 10, 12, 18, 15, 20, 15, 22, 10, 8, 12],
+    borderColor: '#bc13fe',
+    borderWidth: 2,
+    borderDash: [5, 5],
+    tension: 0.4
+    }]
+    },
+    options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#c5c6c7' } } },
+    scales: {
+    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#888' } },
+    x: { grid: { display: false }, ticks: { color: '#888' } }
+    },
+    animation: { duration: 0 } // Tắt hiệu ứng giật khi update liên tục
+    }
+    });
+
+    // 2. Vòng lặp cập nhật dữ liệu liên tục mỗi 2 giây
+    setInterval(() => {
+    // Cập nhật biểu đồ mạng (Đẩy dữ liệu cũ ra, nhét dữ liệu mới vào)
+    let newInbound = Math.floor(Math.random() * 40) + 10;
+    let newOutbound = Math.floor(newInbound * 0.6);
+
+    networkChart.data.datasets[0].data.shift();
+    networkChart.data.datasets[0].data.push(newInbound);
+    networkChart.data.datasets[1].data.shift();
+    networkChart.data.datasets[1].data.push(newOutbound);
+    networkChart.update();
+
+    // Cập nhật phần cứng CPU/RAM/GPU
+    let cpu = Math.floor(Math.random() * 30) + 10; // CPU 10% - 40%
+    let ram = Math.floor(Math.random() * 10) + 40; // RAM 40% - 50%
+    let gpu = Math.floor(Math.random() * 20) + 70; // GPU đang giải mã RSA: 70% - 90%
+
+    document.getElementById('cpuBar').style.width = cpu + '%';
+    document.getElementById('cpuText').innerText = cpu + '%';
+
+    document.getElementById('ramBar').style.width = ram + '%';
+    document.getElementById('ramText').innerText = ram + '%';
+
+    document.getElementById('gpuBar').style.width = gpu + '%';
+    document.getElementById('gpuText').innerText = gpu + '%';
+
+    }, 2000);
+
+    // 3. Hiệu ứng chạy chữ Terminal "Matrix"
+    const consoleBox = document.getElementById('matrixConsole');
+    const processes = [
+    "Encrypting packet payload with AES-GCM-256...",
+    "Validating RSA-PSS signature block...",
+    "Checking Nonce idempotency in SQL Database...",
+    "Routing secure packet to Node 0x9A4F...",
+    "Firewall rule #845 applied. Traffic sanitized.",
+    "Handshake verified. Key exchange successful.",
+    "Garbage collection triggered on RAM buffer."
+    ];
+
+    setInterval(() => {
+    let randomMsg = processes[Math.floor(Math.random() * processes.length)];
+    let timeStamp = new Date().toISOString().substring(11, 23);
+    let newLine = document.createElement('div');
+    newLine.innerHTML = `[${timeStamp}] sys_daemon: ${randomMsg}`;
+
+    consoleBox.appendChild(newLine);
+
+    // Xóa dòng cũ nếu quá nhiều để tránh nặng trang
+    if (consoleBox.children.length > 7) {
+    consoleBox.removeChild(consoleBox.firstChild);
+    }
+    consoleBox.scrollTop = consoleBox.scrollHeight;
+    }, 800);
+    });
+</script>

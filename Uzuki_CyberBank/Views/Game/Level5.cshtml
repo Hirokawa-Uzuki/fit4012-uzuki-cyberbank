@@ -1,0 +1,246 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Level 5 - Dynamic Key Rotation";
+}
+
+<style>
+    /* Hiệu ứng hiển thị Khóa bảo mật */
+    .key-display {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        word-break: break-all;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .key-compromised {
+        background: rgba(255, 0, 60, 0.1);
+        color: #ff003c;
+        border: 1px dashed #ff003c;
+        box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
+    }
+
+    .key-secured {
+        background: rgba(74, 246, 38, 0.1);
+        color: #4af626;
+        border: 1px solid #4af626;
+        box-shadow: 0 0 20px rgba(74, 246, 38, 0.4);
+    }
+
+    /* Hiệu ứng chớp cảnh báo */
+    .leak-warning {
+        animation: pulseWarning 1.5s infinite;
+    }
+
+    /* FIX LỖI RAZOR: Dùng 2 dấu @@ cho keyframes */
+    @@keyframes pulseWarning {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 0, 60, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 0, 60, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 0, 60, 0);
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-danger pb-2" id="headerSection">
+        <h2 class="text-danger" style="font-family: 'Orbitron', sans-serif;" id="mainTitle">
+            <i class="fa-solid fa-unlock-keyhole me-2"></i> LEVEL 5: RÒ RỈ KHÓA CỨNG (KEY LEAK)
+        </h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">RỜI KHỎI</a>
+    </div>
+
+    <div id="dynamicAlert" class="alert bg-transparent shadow-sm mb-4" style="display: none; border-width: 1px; border-style: solid;">
+        <h5 id="alertTitle" class="fw-bold"></h5>
+        <p id="alertDesc" class="mb-0 small"></p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card mb-4 bg-dark h-100" style="border: 1px solid #ff003c;" id="actionCard">
+                <div class="card-header bg-danger text-white fw-bold d-flex justify-content-between align-items-center" id="cardHeader">
+                    <span><i class="fa-solid fa-radiation me-2"></i>CẢNH BÁO: MÃ NGUỒN BỊ DỊCH NGƯỢC</span>
+                    <span class="badge bg-dark text-danger border border-danger leak-warning" id="badgeStatus">CRITICAL</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-light small mb-3">
+                        Hacker đã tải được file <code class="text-warning">appsettings.json</code> và đọc được chuỗi Secret Key dùng để mã hóa AES-GCM. Lúc này, mọi lớp bảo mật truyền tải ở các level trước đều trở nên vô nghĩa vì kẻ gian đã nắm được "chìa khóa vạn năng".
+                    </p>
+
+                    <div class="mb-4 text-center">
+                        <label id="keyStatusLabel" class="form-label text-danger fw-bold small text-uppercase">
+                            <i class="fa-solid fa-bug me-1"></i> Khóa tĩnh bị rò rỉ (Hardcoded Key)
+                        </label>
+                        <div id="cryptoKeyDisplay" class="key-display key-compromised fw-bold">
+                            @ViewBag.LeakedKey
+                        </div>
+                    </div>
+
+                    <div class="card border-info mb-4" style="background: #050505;" id="keyGenConsoleBox">
+                        <div class="card-header bg-dark border-info text-info fw-bold py-2">
+                            <span class="small"><i class="fa-solid fa-terminal me-2"></i>KEY ROTATION LOGS</span>
+                        </div>
+                        <div class="card-body p-2" id="keyGenConsole" style="height: 140px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
+                            <div class="text-muted mb-1">> Hệ thống mã hóa đang trong trạng thái NGUY HIỂM...</div>
+                            <div class="text-muted">> Đang chờ lệnh xoay vòng khóa từ Quản trị viên...</div>
+                        </div>
+                    </div>
+
+                    <button id="btnRotateKey" class="cyber-btn w-100 py-3 fs-5 fw-bold" style="border-color: #00f3ff; color: #00f3ff;">
+                        <i class="fa-solid fa-sync fa-spin-hover me-2"></i> KÍCH HOẠT XOAY VÒNG KHÓA
+                    </button>
+
+                    <a href="/Game/PlayLevel?levelId=6" id="btnNextLevel" class="cyber-btn w-100 mt-2 text-center py-3 fs-6 fw-bold" style="border-color: #4af626; color: #4af626; display: none; box-shadow: inset 0 0 15px rgba(74, 246, 38, 0.2);">
+                        HỆ THỐNG KHÓA ĐÃ AN TOÀN - TIẾN VÀO LEVEL 6 <i class="fa-solid fa-forward ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning h-100 bg-dark">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-book-journal-whills me-2"></i>BÁO CÁO PHÂN TÍCH LỖ HỔNG (CWE-798)
+                </div>
+                <div class="card-body text-light overflow-auto" style="max-height: 600px;">
+                    <h6 class="text-warning fw-bold">1. Lỗ hổng Hardcoded Secrets (CWE-798)</h6>
+                    <p class="small text-muted text-justify">
+                        Việc gán cứng trực tiếp (hardcode) các thông tin nhạy cảm như Mật khẩu Database, API Keys, hay Secret Keys mã hóa thẳng vào mã nguồn (C#) hoặc file cấu hình không được bảo vệ là một lỗi sơ đẳng nhưng cực kỳ phổ biến. Kẻ gian chỉ cần Decompile (dịch ngược) phần mềm hoặc truy cập được kho lưu trữ Git là có thể tước đoạt toàn bộ hệ thống.
+                    </p>
+
+                    <h6 class="text-info fw-bold mt-4">2. Xoay vòng khóa động (Dynamic Key Rotation)</h6>
+                    <p class="small text-muted text-justify mb-2">
+                        Để khắc phục, Nhóm 15 áp dụng cơ chế <strong>Session-based Key</strong> (Khóa theo phiên).
+                    </p>
+                    <ul class="small text-muted text-justify mb-3">
+                        <li>Khi Server khởi động hoặc phát hiện nghi vấn, nó sẽ tự động chạy thuật toán sinh số giả ngẫu nhiên an toàn mật mã (CSPRNG) để tạo ra một chuỗi khóa hoàn toàn mới.</li>
+                        <li>Khóa này chỉ tồn tại trên RAM trong một thời gian ngắn. Kể cả Hacker có chụp được bộ nhớ lúc đó, thì vài giờ sau, khóa cũng đã tự động biến đổi (Rotate) thành một hình thái khác.</li>
+                    </ul>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-shield-halved text-success me-1"></i> <strong>Thực tiễn trong Doanh nghiệp:</strong>
+                        <br />Ở cấp độ quy mô lớn (Enterprise), thay vì tự quản lý trên RAM, các ngân hàng sẽ đẩy khóa này vào các dịch vụ Quản lý khóa chuyên dụng (KMS) như <strong>Azure Key Vault</strong> hay <strong>AWS Secrets Manager</strong>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    $('#btnRotateKey').click(function () {
+    let btn = $(this);
+    btn.prop('disabled', true).html('<i class="fa-solid fa-satellite-dish fa-fade me-2"></i> ĐANG THIẾT LẬP KÊNH BẢO MẬT...');
+
+    let keyDisplay = $('#cryptoKeyDisplay');
+    let keyLabel = $('#keyStatusLabel'); // Tóm lấy cái Label để đổi màu
+    let consoleBox = $('#keyGenConsole');
+    let successAudio = document.getElementById('successAudio');
+
+    const printLog = (text, className) => {
+    let time = new Date().toISOString().substring(11, 23);
+    consoleBox.append(`<div class="${className} mb-1">> [${time}] ${text}</div>`);
+    consoleBox.scrollTop(consoleBox[0].scrollHeight);
+    };
+
+    // Bắn AJAX gọi Server tạo khóa mới
+    $.ajax({
+    url: '/Game/FireAjaxLevel5',
+    type: 'POST',
+    success: function (response) {
+    if (response.code === 200) {
+
+    // Đổi Label sang trạng thái Đang xử lý
+    keyLabel.removeClass('text-danger').addClass('text-warning')
+    .html('<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang sinh khóa ngẫu nhiên...');
+
+    // Đẩy log vào Terminal tạo sự hồi hộp
+    printLog("Đang tiêu hủy Khóa tĩnh (Hardcoded Key) khỏi bộ nhớ...", "text-danger");
+    setTimeout(() => printLog("Khởi tạo bộ sinh số giả ngẫu nhiên (CSPRNG)...", "text-warning"), 400);
+    setTimeout(() => printLog("Đang cấp phát khóa Session mới độ dài 256-bit...", "text-info"), 800);
+
+    // --- HIỆU ỨNG MA TRẬN (MATRIX GLITCH) ---
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@@#$%^&*';
+    let iterations = 0;
+
+    let glitchInterval = setInterval(() => {
+    let randomString = '';
+    for (let i = 0; i < 32; i++) {
+    randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    keyDisplay.text(randomString);
+    iterations++;
+
+    // Sau khi chớp khoảng 1.2 giây, chốt khóa
+    if (iterations >= 24) {
+    clearInterval(glitchInterval);
+
+    // Hiển thị khóa mới chuẩn từ Server
+    keyDisplay.text(response.newKey);
+
+    // FIX LỖI: Đổi màu chữ Label phía trên hộp khóa thành màu Xanh
+    keyLabel.removeClass('text-warning').addClass('text-success')
+    .html('<i class="fa-solid fa-shield-check me-2"></i>KHÓA ĐỘNG AN TOÀN (SESSION KEY ACTIVE)');
+
+    // Đổi màu viền Hộp khóa sang an toàn
+    keyDisplay.removeClass('key-compromised').addClass('key-secured');
+
+    // Đổi màu Header Card thành xanh
+    $('#actionCard').css('border-color', '#4af626');
+    $('#cardHeader').removeClass('bg-danger').addClass('bg-success');
+    $('#cardHeader span:first').html('<i class="fa-solid fa-shield-check me-2"></i>MÃ NGUỒN ĐÃ ĐƯỢC BẢO VỆ');
+
+    // Đổi chữ CRITICAL thành SECURED
+    $('#badgeStatus').removeClass('bg-dark text-danger border-danger leak-warning')
+    .addClass('bg-light text-success border-light').text('SECURED');
+
+    // Đổi màu Tiêu đề lớn
+    $('#headerSection').removeClass('border-danger').addClass('border-success');
+    $('#mainTitle').removeClass('text-danger').addClass('text-success')
+    .html('<i class="fa-solid fa-shield-check me-2"></i> LEVEL 5: BẢO MẬT KHÓA ĐỘNG THÀNH CÔNG');
+
+    // Hiện Banner Xanh
+    $('#dynamicAlert')
+    .removeClass('alert-danger border-danger text-danger')
+    .addClass('alert-success border-success text-success')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-circle-check me-2"></i>ĐÃ THAY KHÓA THÀNH CÔNG');
+    $('#alertDesc').text(response.message);
+
+    // Đẩy log cuối
+    printLog("Đã nạp Session Key mới vào RAM.", "text-success fw-bold");
+    printLog("Hệ thống mã hóa AES-GCM đã hoạt động trở lại!", "text-success fw-bold");
+
+    // Đổi nút bấm
+    btn.hide();
+    $('#btnNextLevel').fadeIn();
+
+    // SFX
+    if(successAudio) { successAudio.volume = 0.8; successAudio.play(); }
+    }
+    }, 50);
+
+    } else {
+    alert("Hệ thống báo lỗi: " + response.message);
+    btn.prop('disabled', false).html('<i class="fa-solid fa-sync me-2"></i> THỬ LẠI');
+    }
+    },
+    error: function (xhr, status, error) {
+    alert("Kết nối thất bại! Mã lỗi HTTP: " + xhr.status);
+    btn.prop('disabled', false).html('<i class="fa-solid fa-sync me-2"></i> THỬ LẠI');
+    }
+    });
+    });
+    });
+</script>

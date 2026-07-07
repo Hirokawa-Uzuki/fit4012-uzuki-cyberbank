@@ -1,0 +1,310 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Level 7 - The Grand Finale (DDoS Defense)";
+}
+
+<style>
+    /* KHU VỰC ĐỒ HỌA MÔ PHỎNG SERVER */
+    .server-room {
+        background: radial-gradient(circle at center, #111 0%, #000 100%);
+        border: 2px solid #333;
+        border-radius: 10px;
+        height: 250px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Lõi Server */
+    .server-core {
+        font-size: 5rem;
+        color: #00f3ff;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    /* Trạng thái Server bị Overload (DDoS) */
+    .core-overload {
+        color: #ff003c !important;
+        animation: shakeVibrate 0.2s infinite;
+        text-shadow: 0 0 30px #ff003c;
+    }
+
+    /* Lá chắn Middleware */
+    .rate-limit-shield {
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 4px dashed #4af626;
+        box-shadow: 0 0 40px rgba(74, 246, 38, 0.4);
+        opacity: 0;
+        z-index: 3;
+        transform: scale(0.5);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .shield-active {
+        opacity: 1;
+        transform: scale(1);
+        animation: spinShield 10s linear infinite;
+    }
+
+    /* Thanh phần cứng CPU/GPU */
+    .hardware-stress {
+        width: 80%;
+        height: 15px;
+        background: #222;
+        border-radius: 10px;
+        margin-top: 20px;
+        z-index: 4;
+        border: 1px solid #555;
+    }
+
+    .stress-bar {
+        height: 100%;
+        width: 10%; /* Mặc định 10% */
+        background: #00f3ff;
+        border-radius: 10px;
+        transition: all 0.5s ease;
+    }
+
+    /* Hiệu ứng rung bần bật khi bị tấn công */
+    @@keyframes shakeVibrate {
+        0% {
+            transform: translate(2px, 1px) rotate(0deg);
+        }
+
+        10% {
+            transform: translate(-1px, -2px) rotate(-1deg);
+        }
+
+        20% {
+            transform: translate(-3px, 0px) rotate(1deg);
+        }
+
+        30% {
+            transform: translate(0px, 2px) rotate(0deg);
+        }
+
+        40% {
+            transform: translate(1px, -1px) rotate(1deg);
+        }
+
+        50% {
+            transform: translate(-1px, 2px) rotate(-1deg);
+        }
+
+        60% {
+            transform: translate(-3px, 1px) rotate(0deg);
+        }
+
+        70% {
+            transform: translate(2px, 1px) rotate(-1deg);
+        }
+
+        80% {
+            transform: translate(-1px, -1px) rotate(1deg);
+        }
+
+        90% {
+            transform: translate(2px, 2px) rotate(0deg);
+        }
+
+        100% {
+            transform: translate(1px, -2px) rotate(-1deg);
+        }
+    }
+
+    /* Hiệu ứng xoay vòng lá chắn */
+    @@keyframes spinShield {
+        100% {
+            transform: scale(1) rotate(360deg);
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-danger pb-2">
+        <h2 class="text-danger" style="font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(255,0,60,0.5);">
+            <i class="fa-solid fa-skull me-2"></i> LEVEL 7: TRẬN CHIẾN CUỐI CÙNG (DDoS)
+        </h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">TẨU THOÁT</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="server-room shadow-lg mb-3">
+                <div class="rate-limit-shield" id="middlewareShield"></div>
+                <i class="fa-solid fa-server server-core" id="serverCoreIcon"></i>
+
+                <div class="hardware-stress mt-4">
+                    <div class="stress-bar" id="cpuBar"></div>
+                </div>
+                <small class="text-muted mt-2 fw-bold" id="cpuLabel">CPU LOAD: 10% (IDLE)</small>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button id="btnDDoS" class="cyber-btn w-100 py-3 fs-6 fw-bold" style="border-color: #ff003c; color: #ff003c;">
+                        <i class="fa-solid fa-fire me-2"></i> KÍCH HOẠT BOTNET (DDoS)
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button id="btnActivateShield" class="cyber-btn w-100 py-3 fs-6 fw-bold" style="border-color: #4af626; color: #4af626;">
+                        <i class="fa-solid fa-shield-cat me-2"></i> BẬT LÁ CHẮN MIDDLEWARE
+                    </button>
+                </div>
+            </div>
+
+            <div class="card border-info" style="background: #050505;">
+                <div class="card-header bg-dark border-info text-info fw-bold py-2">
+                    <span class="small"><i class="fa-solid fa-terminal me-2"></i>NETWORK TRAFFIC MONITOR</span>
+                </div>
+                <div class="card-body p-2" id="trafficConsole" style="height: 180px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
+                    <div class="text-info">> HỆ THỐNG UZUKI_CYBERBANK ĐANG HOẠT ĐỘNG ỔN ĐỊNH...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning bg-dark h-100 text-light">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-book-skull me-2"></i>BÁO CÁO TẤN CÔNG (CWE-400)
+                </div>
+                <div class="card-body overflow-auto" style="max-height: 600px;">
+                    <h6 class="text-danger fw-bold">1. Cryptographic DDoS (Từ chối dịch vụ Thuật toán)</h6>
+                    <p class="small text-muted text-justify">
+                        Hacker nhận ra RSA-PSS là một thuật toán tốn rất nhiều tài nguyên (CPU/RAM) để giải mã và xác thực. Chúng không cần phải cố gắng bẻ khóa, chúng chỉ cần dùng một mạng máy tính ma (Botnet) gửi hàng triệu gói tin chứa chữ ký rác cùng một lúc. Server sẽ bị vắt kiệt sức lực để giải mã đống rác này, dẫn đến hiện tượng <strong>nghẽn cổ chai (Bottleneck)</strong> và sập toàn bộ hệ thống ngân hàng.
+                    </p>
+
+                    <h6 class="text-success fw-bold mt-4">2. Bức Tường Thép: Rate Limiting Middleware</h6>
+                    <p class="small text-muted text-justify">
+                        Để bảo vệ lõi Server, Nhóm 15 đặt một trạm gác (Middleware) ngay tại cửa ngõ của ứng dụng ASP.NET Core.
+                    </p>
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-filter text-success me-1"></i> <strong>Cơ chế hoạt động:</strong>
+                        <br />Khi phát hiện một IP hoặc Session gửi quá 5 request trong vòng 10 giây, Middleware lập tức "đóng sầm cửa lại". Request của Hacker sẽ bị vứt bỏ ngay lập tức và trả về mã lỗi <code>HTTP 429: Too Many Requests</code>.
+                        <br /><br />
+                        <strong>Kết quả:</strong> Request bị chặn mà chưa hề chạm tới tầng Controller, giải phóng hoàn toàn gánh nặng cho CPU, giúp ngân hàng sống sót qua cơn bão mạng.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="grandFinaleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark border-warning" style="box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);">
+            <div class="modal-body text-center p-5">
+                <i class="fa-solid fa-crown text-warning mb-3" style="font-size: 6rem; text-shadow: 0 0 30px gold;"></i>
+                <h1 class="text-warning fw-bold" style="font-family: 'Orbitron', sans-serif;">GAME CLEARED!</h1>
+                <h3 class="text-light mt-2">UZUKI CYBERBANK SECURED</h3>
+                <p class="text-muted mt-3 fs-5">
+                    Xuất sắc! Nhóm 15 đã xây dựng thành công lớp phòng thủ đa tầng (Defense in Depth). <br />
+                    Từ mã hóa AES, chữ ký số RSA, chống SQL Injection đến Rate Limiting. Hệ thống của bạn giờ đây đã là một pháo đài bất khả xâm phạm!
+                </p>
+                <hr class="border-warning my-4" />
+                <a asp-controller="Home" asp-action="Leaderboard" class="btn btn-warning px-5 py-3 fw-bold fs-5 w-100" style="color: #000;">
+                    <i class="fa-solid fa-ranking-star me-2"></i> TIẾN TỚI BẢNG PHONG THẦN (LEADERBOARD)
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    // Biến trạng thái: Khiên đang tắt
+    let isShieldActive = false;
+
+    let consoleBox = $('#trafficConsole');
+    let cpuBar = $('#cpuBar');
+    let cpuLabel = $('#cpuLabel');
+    let serverCore = $('#serverCoreIcon');
+    let shieldElement = $('#middlewareShield');
+
+    const printLog = (text, className) => {
+    let time = new Date().toISOString().substring(11, 23);
+    consoleBox.append(`<div class="${className} mb-1">> [${time}] ${text}</div>`);
+    consoleBox.scrollTop(consoleBox[0].scrollHeight);
+    };
+
+    // 1. NGƯỜI CHƠI BẤM BẬT KHIÊN (Chỉ bấm 1 lần)
+    $('#btnActivateShield').click(function () {
+    isShieldActive = true; // Bật cờ trạng thái
+
+    // Đồ họa: Đổi màu UI sang Xanh lá
+    shieldElement.addClass('shield-active');
+    serverCore.css('color', '#4af626');
+
+    // Xóa hiệu ứng quá tải nếu có
+    serverCore.removeClass('core-overload');
+    cpuBar.css({ 'width': '15%', 'background': '#4af626' });
+    cpuLabel.text('CPU LOAD: 15% (SHIELD ACTIVE)').removeClass('text-danger').addClass('text-success');
+
+    printLog("RATE LIMITING MIDDLEWARE KHỞI ĐỘNG. LÁ CHẮN ĐÃ KÍCH HOẠT!", "text-success fw-bold");
+
+    // Khóa nút bật khiên lại (Hợp lý)
+    $(this).prop('disabled', true).html('<i class="fa-solid fa-shield-check me-2"></i> LÁ CHẮN ĐANG HOẠT ĐỘNG');
+
+    let sfx = document.getElementById('successAudio');
+    if(sfx) { sfx.volume = 0.8; sfx.play(); }
+    });
+
+    // 2. NGƯỜI CHƠI BẤM NÚT TẤN CÔNG (DDoS)
+    $('#btnDDoS').click(function () {
+    let btn = $(this);
+    btn.prop('disabled', true); // Tạm khóa chống spam click cơ học
+
+    // KỊCH BẢN 1: TẤN CÔNG KHI CHƯA CÓ KHIÊN
+    if (!isShieldActive) {
+    serverCore.addClass('core-overload');
+    cpuBar.css({ 'width': '100%', 'background': '#ff003c' });
+    cpuLabel.text('CPU LOAD: 100% (CRITICAL FAILURE)').addClass('text-danger');
+    printLog("PHÁT HIỆN LƯU LƯỢNG BẤT THƯỜNG! Đang chuyển gói tin vào lõi RSA để giải mã...", "text-warning");
+
+    $.post('/Game/FireAjaxLevel7', { isShieldActive: false }, function (response) {
+    printLog(response.message, "text-danger fw-bold");
+
+    let alarm = document.getElementById('alarmAudio');
+    if(alarm) { alarm.volume = 0.8; alarm.currentTime = 0; alarm.play(); }
+
+    btn.prop('disabled', false); // MỞ KHÓA NÚT THÀNH CÔNG
+    });
+    }
+    // KỊCH BẢN 2: TẤN CÔNG KHI ĐÃ CÓ KHIÊN BẢO VỆ
+    else {
+    printLog("BOTNET ĐANG TẤN CÔNG! Hàng ngàn gói tin rác dội vào tường lửa...", "text-warning");
+
+    cpuBar.css('width', '25%');
+    cpuLabel.text('CPU LOAD: 25% (HANDLING DROPS)');
+    setTimeout(() => { cpuBar.css('width', '15%'); cpuLabel.text('CPU LOAD: 15% (STABLE)'); }, 500);
+
+    $.post('/Game/FireAjaxLevel7', { isShieldActive: true }, function (response) {
+    printLog(response.message, "text-success fw-bold");
+
+    shieldElement.css('box-shadow', '0 0 80px #4af626');
+    setTimeout(() => shieldElement.css('box-shadow', '0 0 40px rgba(74, 246, 38, 0.4)'), 300);
+
+    // FIX LỖI Ở ĐÂY: MỞ KHÓA NÚT BOTNET ĐỂ BẠN CÓ THỂ BẤM SPAM LIÊN TỤC
+    btn.prop('disabled', false);
+
+    // Vẫn giữ code ẩn Modal vinh quang như yêu cầu trước đó của bạn
+    setTimeout(() => {
+    let winMusic = document.getElementById('successAudio');
+    if(winMusic) { winMusic.volume = 1.0; winMusic.play(); }
+
+    // let finaleModal = new bootstrap.Modal(document.getElementById('grandFinaleModal'));
+    // finaleModal.show();
+    }, 1500);
+    });
+    }
+    });
+    });
+</script>

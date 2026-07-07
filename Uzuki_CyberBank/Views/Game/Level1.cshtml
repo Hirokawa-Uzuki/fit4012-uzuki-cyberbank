@@ -1,0 +1,89 @@
+﻿@model Uzuki_CyberBank.ViewModels.Level1ViewModel
+@{
+    ViewData["Title"] = "Level 1 - Bảo mật giao dịch";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-info pb-2">
+        <h2 class="text-info"><i class="fa-solid fa-lock me-2"></i>LEVEL 1: MÃ HÓA GIAO DỊCH</h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Rời khỏi
+        </a>
+    </div>
+
+    @if (Model.IsCompleted)
+    {
+        <div class="alert alert-success bg-transparent border-success text-success shadow-sm mb-4">
+            <h5><i class="fa-solid fa-check-circle me-2"></i>@Model.SystemMessage</h5>
+            <p class="mb-0 small">Gói tin đã được an toàn trên đường truyền. Không một ai có thể đọc được nội dung ngoại trừ Server.</p>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-transparent border-info text-info fw-bold">
+                    <i class="fa-solid fa-satellite-dish me-2"></i>TRẠM ĐÁNH CHẶN (INTERCEPTOR)
+                </div>
+                <div class="card-body">
+                    <p class="text-light">Phát hiện một giao dịch chuẩn bị được gửi đi dạng rõ (Plaintext). Hãy mã hóa nó để tránh bị đánh cắp thông tin!</p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-warning small">Gói tin ban đầu (Raw JSON)</label>
+                        <textarea class="form-control bg-dark text-success font-monospace" rows="3" readonly>@Model.RawJsonPayload</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-warning small">Khóa bí mật (AES-256 Key - Base64)</label>
+                        <input type="text" class="form-control bg-dark text-danger font-monospace" value="@Model.SecretKey" readonly />
+                    </div>
+
+                    @if (!Model.IsCompleted)
+                    {
+                        <form asp-action="ExecuteLevel1" method="post">
+                            <input type="hidden" name="rawJson" value="@Model.RawJsonPayload" />
+                            <input type="hidden" name="secretKey" value="@Model.SecretKey" />
+                            <button type="submit" class="cyber-btn w-100 mt-2">
+                                <i class="fa-solid fa-shield-virus me-2"></i> KÍCH HOẠT MÃ HÓA AES-GCM
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="mb-3 mt-4">
+                            <label class="form-label text-info small"><i class="fa-solid fa-file-shield me-1"></i> Gói tin đã mã hóa (CipherText)</label>
+                            <textarea class="form-control bg-dark text-info font-monospace" rows="4" readonly>@Model.CipherText</textarea>
+                        </div>
+                        <a asp-controller="Home" asp-action="Index" class="cyber-btn w-100 mt-2 text-center">
+                            TIẾP TỤC <i class="fa-solid fa-forward ms-2"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card border-warning">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>TÀI LIỆU HỌC THUẬT
+                </div>
+                <div class="card-body text-light">
+                    <h6 class="text-info">1. Tấn công nghe lén (Sniffing)</h6>
+                    <p class="small text-muted">Nếu dữ liệu gửi đi không được mã hóa, tin tặc có thể sử dụng các công cụ bắt gói tin (như Wireshark) để đọc được số tài khoản, số tiền và thông tin định danh.</p>
+
+                    <h6 class="text-info mt-3">2. Giải pháp: Mã hóa đối xứng AES-GCM</h6>
+                    <p class="small text-muted mb-1">
+                        <strong>AES (Advanced Encryption Standard):</strong> Thuật toán mã hóa đối xứng an toàn nhất hiện nay. Chìa khóa (Key) được dùng chung cho cả việc mã hóa và giải mã.
+                    </p>
+                    <p class="small text-muted">
+                        <strong>Chế độ GCM (Galois/Counter Mode):</strong> Không chỉ mã hóa dữ liệu thành các ký tự vô nghĩa (CipherText) mà còn sinh ra một Tag xác thực, giúp phát hiện nếu dữ liệu bị thay đổi trên đường truyền.
+                    </p>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-2 small">
+                        <i class="fa-solid fa-circle-info text-info me-1"></i> <strong>Cảnh báo thực tế:</strong> Không bao giờ được hard-code khóa bí mật (Secret Key) trực tiếp vào mã nguồn.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+﻿@model Uzuki_CyberBank.Models.User
+@{
+    ViewData["Title"] = "Dashboard - Uzuki CyberBank";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-dark text-white shadow">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">Xin chào, Chuyên gia bảo mật <strong>@Model.Username</strong>!</h4>
+                        <p class="mb-0 mt-1 text-info">Chào mừng trở lại hệ thống Uzuki CyberBank.</p>
+                    </div>
+                    <div class="text-end">
+                        <h5 class="mb-0 text-warning">Điểm an ninh: @Model.Score KP</h5>
+                        <small>Cấp độ hiện tại: Level @Model.CurrentLevel</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 border-bottom pb-2">Danh sách nhiệm vụ (Mô phỏng tấn công)</h4>
+
+    <div class="row">
+        @if (ViewBag.Levels != null)
+        {
+            foreach (var level in ViewBag.Levels)
+            {
+                // Kiểm tra xem người chơi đã mở khóa màn này chưa
+                bool isUnlocked = Model.CurrentLevel >= level.LevelId;
+                string cardClass = isUnlocked ? "border-primary" : "border-secondary opacity-50";
+                string btnClass = isUnlocked ? "btn-primary" : "btn-secondary disabled";
+                string statusText = isUnlocked ? "Mở khóa" : "Bị khóa";
+
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm @cardClass">
+                        <div class="card-header d-flex justify-content-between">
+                            <strong>Level @level.LevelId</strong>
+                            <span class="badge @(isUnlocked ? "bg-success" : "bg-secondary")">@statusText</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">@level.LevelName</h5>
+                            <p class="card-text small">@level.Description</p>
+                            <hr />
+                            <p class="mb-1 small"><strong>Nguy cơ:</strong> @level.AttackType</p>
+                            <p class="mb-3 small"><strong>Phòng thủ:</strong> @level.RequiredDefense</p>
+
+                            <a href="/Game/PlayLevel?levelId=@level.LevelId" class="btn @btnClass w-100">Bắt đầu mô phỏng</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

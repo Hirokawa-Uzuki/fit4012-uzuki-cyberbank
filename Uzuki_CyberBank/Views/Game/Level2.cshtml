@@ -1,0 +1,172 @@
+﻿@model Uzuki_CyberBank.ViewModels.Level2ViewModel
+@{
+    ViewData["Title"] = "Level 2 - Interactive MitM Simulator";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-warning pb-2" style="border-color: #ffd700 !important;">
+        <h2 style="color: #ffd700; font-family: 'Orbitron', sans-serif;"><i class="fa-solid fa-file-signature me-2"></i>LEVEL 2: KIỂM TRA TOÀN VẸN (INTERACTIVE)</h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Rời khỏi
+        </a>
+    </div>
+
+    <div id="dynamicAlert" class="alert bg-transparent shadow-sm mb-4" style="display: none; border-width: 1px; border-style: solid;">
+        <h5 id="alertTitle"></h5>
+        <p id="alertDesc" class="mb-0 small"></p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+
+            <div class="card mb-4 shadow-lg" style="border-color: #ffd700; background: rgba(11,12,16,0.9);">
+                <div class="card-header bg-transparent fw-bold" style="color: #ffd700; border-bottom: 1px solid #ffd700;">
+                    <i class="fa-solid fa-mask me-2"></i>MAN-IN-THE-MIDDLE INTERCEPTOR
+                </div>
+                <div class="card-body">
+                    <p class="text-light small mb-3">
+                        <i class="fa-solid fa-circle-info text-info me-1"></i>
+                        <strong>HƯỚNG DẪN DEMO:</strong> Hệ thống đã bắt giữ gói tin mã hóa an toàn của Giám đốc. Hãy thử bấm gửi ngay để xem gói tin đi qua, hoặc <strong>tự tay chỉnh sửa/xóa bớt vài ký tự</strong> trong ô đỏ bên dưới để đóng vai Hacker phá hoại!
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-danger small fw-bold"><i class="fa-solid fa-pen-clip me-1"></i> Chuỗi Dữ Liệu Mã Hóa (Có thể chỉnh sửa trực tiếp)</label>
+                        <textarea id="tamperedCipher" class="form-control bg-dark text-danger font-monospace border-danger shadow-sm" rows="3" style="font-size: 0.9rem;">@Model.OriginalCipherText</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small">Mã Xác Thực Gốc (Tag / MAC)</label>
+                            <input type="text" id="secTag" class="form-control bg-dark text-secondary font-monospace form-control-sm" value="@Model.Tag" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small">Biến số ngẫu nhiên (Nonce)</label>
+                            <input type="text" id="secNonce" class="form-control bg-dark text-secondary font-monospace form-control-sm" value="@Model.Nonce" readonly />
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="secKey" value="@Model.SecretKey" />
+
+                    <button id="btnForwardPacket" class="cyber-btn w-100 py-3 fs-5 mt-2" style="border-color: #ffd700; color: #ffd700; box-shadow: inset 0 0 10px rgba(255,215,0,0.2);">
+                        <i class="fa-solid fa-share-from-square me-2"></i> FORWARD TO SERVER (CHUYỂN TIẾP GÓI TIN)
+                    </button>
+
+                    <a href="/Game/PlayLevel?levelId=3" id="btnNextLevel" class="cyber-btn w-100 mt-4 text-center py-2" style="border-color: #4af626; color: #4af626; display: none;">
+                        XÁC THỰC TOÀN VẸN THÀNH CÔNG - TIẾN VÀO LEVEL 3 <i class="fa-solid fa-forward ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-info mb-4" style="background: #050505;">
+                <div class="card-header bg-dark border-info text-info fw-bold d-flex justify-content-between py-2">
+                    <span class="small"><i class="fa-solid fa-terminal me-2"></i>SERVER SECURITY MONITOR</span>
+                    <span class="spinner-grow spinner-grow-sm text-warning" role="status"></span>
+                </div>
+                <div class="card-body p-2" id="serverConsole" style="height: 220px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.82rem;">
+                    <div class="text-muted mb-2">> Đang lắng nghe luồng traffic đầu vào từ cổng kiểm tra mạng...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning h-100">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>TÀI LIỆU HỌC THUẬT & KIẾN TRÚC
+                </div>
+                <div class="card-body text-light overflow-auto" style="max-height: 600px;">
+                    <h6 class="text-info fw-bold">1. Kịch bản Tấn công Sửa đổi (Data Tampering / Bit-flipping Attack)</h6>
+                    <p class="small text-muted text-justify">
+                        Trong thực tế mạng máy tính, dù dữ liệu đã được mã hóa (Confidentiality), tin tặc thao túng đường truyền (Man-in-the-Middle) vẫn có thể thực hiện tấn công lật bit (bit-flipping). Bằng cách sửa đổi ngẫu nhiên chuỗi CipherText, hacker hi vọng khi Server giải mã chuỗi rác này, kết quả sẽ vô tình rơi vào một lệnh hợp lệ nhưng có lợi cho chúng (ví dụ: biến số tiền từ 100$ thành 999$).
+                    </p>
+
+                    <h6 class="text-info fw-bold mt-4">2. Tính Toàn Vẹn (Integrity) và Giải pháp Mật mã học</h6>
+                    <p class="small text-muted text-justify">
+                        Để ngăn chặn nguy cơ này, hệ thống bảo mật ngân hàng bắt buộc phải đảm bảo <strong>Tính Toàn Vẹn (Data Integrity)</strong>. Chúng ta phải biết chắc chắn dữ liệu không bị suy suyển một byte nào so với lúc rời khỏi máy người gửi.
+                    </p>
+                    <p class="small text-muted text-justify">
+                        Trong đồ án này, hệ thống áp dụng chế độ <strong>Galois/Counter Mode (GCM)</strong> cho thuật toán AES. Khác với AES-CBC cũ kỹ, AES-GCM thuộc nhóm Authenticated Encryption (Mã hóa có xác thực). Nó không chỉ tạo ra CipherText mà còn đính kèm một mã <strong>MAC (Message Authentication Code)</strong> hay còn gọi là <strong>Tag</strong> (thường dài 16 bytes).
+                    </p>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-crosshairs text-info me-1"></i> <strong>Cơ chế hoạt động tại Server:</strong>
+                        <br />Khi nhận được gói tin, hàm <code>DecryptTransaction()</code> của hệ thống sẽ tính toán lại mã Tag dựa trên CipherText nhận được. Nếu CipherText bị hacker sửa dù chỉ 1 ký tự, mã Tag do Server tính ra sẽ lệch hoàn toàn với mã Tag đính kèm theo gói tin. Ngay lập tức, hàm AES-GCM sẽ ném ra ngoại lệ và từ chối giải mã, chặn đứt hành vi giả mạo dữ liệu.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    $('#btnForwardPacket').click(function () {
+    let tamperedText = $('#tamperedCipher').val();
+    let key = $('#secKey').val();
+    let nonce = $('#secNonce').val();
+    let tag = $('#secTag').val();
+
+    let consoleBox = $('#serverConsole');
+    let timestamp = new Date().toISOString().substring(11, 23);
+
+    // Bắn AJAX ngầm lên Server
+    $.post('/Game/FireAjaxLevel2', {
+    tamperedCipherText: tamperedText,
+    secretKey: key,
+    nonce: nonce,
+    tag: tag
+    }, function (response) {
+
+    if (response.status === "normal") {
+    // --- TRƯỜNG HỢP GÓI TIN NGUYÊN BẢN (KHÔNG SỬA) ---
+    $('#dynamicAlert')
+    .removeClass('alert-danger border-danger text-danger')
+    .addClass('alert-info border-info text-info')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-circle-info me-2"></i>TRAFFIC FLOW NORMAL');
+    $('#alertDesc').text('Gói tin không bị sửa đổi. Server giải mã bình thường và chấp nhận giao dịch.');
+
+    let logLine = `<div class="text-info mb-2">> [${timestamp}] ${response.message}</div>`;
+    consoleBox.append(logLine);
+
+    // SFX Click nhẹ
+    let sfx = document.getElementById('clickAudio');
+    if(sfx) { sfx.currentTime = 0; sfx.play(); }
+    }
+    else if (response.status === "tampered") {
+    // --- TRƯỜNG HỢP ĐÃ BỊ SỬA ĐỔI (BỊ CHẶN) ---
+    $('#dynamicAlert')
+    .removeClass('alert-info border-info text-info')
+    .addClass('alert-danger border-danger text-danger')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-triangle-exclamation me-2"></i>PHÁT HIỆN TẤN CÔNG TOÀN VẸN!');
+    $('#alertDesc').text('Hệ thống Core bắt được lỗi sai lệch MAC Tag của mã hóa AES-GCM. Toàn bộ tiến trình giải mã bị đình chỉ ngay lập tức!');
+
+    // In chi tiết Ngoại lệ lõi của .NET ra Terminal cho ngầu
+    let logLine = `
+    <div class="text-warning mt-1">> [${timestamp}] Server ném lỗi bảo mật:</div>
+    <div class="text-danger font-monospace px-2 small bg-dark border border-danger my-1">
+    [EXCEPTION] ${response.exceptionType}: ${response.exceptionMessage}
+    </div>
+    <div class="text-danger mb-2">> [RESULT] Giao dịch bị hủy. Khóa an toàn node mạng.</div>
+    `;
+    consoleBox.append(logLine);
+
+    // SFX: Hú còi báo động + Chớp đỏ màn hình
+    let alarm = document.getElementById('alarmAudio');
+    if(alarm) { alarm.volume = 0.8; alarm.currentTime = 0; alarm.play(); }
+
+    $('body').addClass('bg-danger');
+    setTimeout(() => $('body').removeClass('bg-danger'), 200);
+
+    // Xuất hiện nút cho phép tiến tới Level 3
+    $('#btnNextLevel').fadeIn();
+    }
+
+    // Tự động cuộn terminal xuống dòng log cuối cùng
+    consoleBox.scrollTop(consoleBox[0].scrollHeight);
+    });
+    });
+    });
+</script>

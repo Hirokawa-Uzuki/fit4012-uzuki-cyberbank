@@ -1,0 +1,247 @@
+﻿@{
+    ViewData["Title"] = "Threat Model Analysis";
+}
+
+<style>
+    /* Hiệu ứng phong cách Hồ Sơ Mật (Classified Document) */
+    .classified-container {
+        background-color: #0b0c10;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Con dấu TOP SECRET */
+    .top-secret-stamp {
+        position: absolute;
+        top: 20px;
+        right: -30px;
+        color: rgba(255, 0, 60, 0.15);
+        font-size: 3.5rem;
+        font-weight: 900;
+        font-family: 'Courier New', Courier, monospace;
+        border: 5px solid rgba(255, 0, 60, 0.15);
+        padding: 10px 40px;
+        transform: rotate(25deg);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .threat-card {
+        background: rgba(15, 15, 26, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 4px solid #4af626; /* Mặc định màu xanh an toàn */
+        transition: all 0.3s ease;
+        z-index: 1;
+        position: relative;
+    }
+
+        .threat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+    /* Đổi màu viền dựa trên loại tấn công */
+    .threat-sniffing {
+        border-left-color: #00f3ff;
+    }
+
+        .threat-sniffing:hover {
+            border-color: #00f3ff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+    .threat-tampering {
+        border-left-color: #ffd700;
+    }
+
+        .threat-tampering:hover {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+    .threat-replay {
+        border-left-color: #bc13fe;
+    }
+
+        .threat-replay:hover {
+            border-color: #bc13fe;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+        }
+
+    .threat-forgery {
+        border-left-color: #ff003c;
+    }
+
+        .threat-forgery:hover {
+            border-color: #ff003c;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+        }
+
+    /* 3 Màu mới cho Level 5, 6, 7 */
+    .threat-leak {
+        border-left-color: #ff8c00;
+    }
+        /* Cam */
+        .threat-leak:hover {
+            border-color: #ff8c00;
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+        }
+
+    .threat-sqli {
+        border-left-color: #4af626;
+    }
+        /* Xanh lá */
+        .threat-sqli:hover {
+            border-color: #4af626;
+            box-shadow: 0 0 15px rgba(74, 246, 38, 0.3);
+        }
+
+    .threat-ddos {
+        border-left-color: #ff00ff;
+    }
+        /* Hồng Neon */
+        .threat-ddos:hover {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+        }
+
+    .defense-badge {
+        background-color: rgba(74, 246, 38, 0.1);
+        color: #4af626;
+        border: 1px solid #4af626;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        font-family: 'Orbitron', sans-serif;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="classified-container shadow-lg">
+        <div class="top-secret-stamp">CONFIDENTIAL</div>
+
+        <div class="text-center mb-5" style="z-index: 1; position: relative;">
+            <h2 style="color: #ff003c; font-family: 'Orbitron', sans-serif; letter-spacing: 3px;">
+                <i class="fa-solid fa-bug me-2"></i> THREAT MODEL ANALYSIS
+            </h2>
+            <p class="text-muted font-monospace">PROJECT: UZUKI_CYBERBANK | TEAM: 15 | DOC_ID: FIT4012-SEC-01</p>
+            <hr class="border-secondary mx-auto" style="width: 50%;" />
+        </div>
+
+        <div class="row position-relative" style="z-index: 1;">
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-sniffing h-100 p-3">
+                    <h5 class="text-info fw-bold"><i class="fa-solid fa-ear-listen me-2"></i>1. Tấn Công Nghe Lén (Sniffing)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Kẻ tấn công sử dụng Wireshark để chặn bắt các gói tin trên đường truyền hòng đánh cắp dữ liệu nhạy cảm (Số tiền, số tài khoản).</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Network Layer / Kênh truyền tải hở.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#00f3ff; border-color:#00f3ff; background:rgba(0,243,255,0.1);">
+                            <i class="fa-solid fa-shield-virus me-1"></i> Mã hóa đối xứng AES-256
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">Tính Bí Mật (Confidentiality)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-tampering h-100 p-3">
+                    <h5 class="text-warning fw-bold"><i class="fa-solid fa-file-pen me-2"></i>2. Sửa Đổi Gói Tin (Tampering)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Hacker đảo lộn các bit (bit-flipping) trong đoạn CipherText với hy vọng Server khi giải mã sẽ ra một lệnh chuyển khoản có lợi cho chúng (Tăng số tiền).</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Man-in-the-Middle (MitM) / Dữ liệu đang truyền.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#ffd700; border-color:#ffd700; background:rgba(255,215,0,0.1);">
+                            <i class="fa-solid fa-fingerprint me-1"></i> AES-GCM (MAC Tag Validation)
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">Tính Toàn Vẹn (Integrity)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-replay h-100 p-3">
+                    <h5 class="fw-bold" style="color: #bc13fe;"><i class="fa-solid fa-clone me-2"></i>3. Tấn Công Phát Lại (Replay)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Bắt một gói tin giao dịch HỢP LỆ và gửi lại (dội bom) hàng trăm lần tới Server để ép tài khoản nạn nhân bị trừ tiền liên tục.</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Điểm mù logic mã hóa (Hệ thống thiếu bộ nhớ).</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#bc13fe; border-color:#bc13fe; background:rgba(188,19,254,0.1);">
+                            <i class="fa-solid fa-database me-1"></i> Nonce Tracking (Idempotency)
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">Chống chối bỏ (Non-replay)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-forgery h-100 p-3">
+                    <h5 class="text-danger fw-bold"><i class="fa-solid fa-mask me-2"></i>4. Mạo Danh Quản Trị (Forgery)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Kẻ gian tạo ra một gói tin mới hoàn toàn, mạo danh tài khoản Giám Đốc để thực hiện lệnh chuyển 1.000.000$ vào tài khoản hacker.</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Identity Theft / Application Layer.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#ff003c; border-color:#ff003c; background:rgba(255,0,60,0.1);">
+                            <i class="fa-solid fa-signature me-1"></i> Chữ Ký Số (RSA-PSS 2048-bit)
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">Tính Xác Thực (Authentication)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-leak h-100 p-3">
+                    <h5 class="fw-bold" style="color: #ff8c00;"><i class="fa-solid fa-unlock-keyhole me-2"></i>5. Rò Rỉ Khóa Cứng (Key Leak)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Hacker dịch ngược mã nguồn (Decompile) hoặc đọc trộm file cấu hình (appsettings) để lấy Secret Key, biến mọi lớp mã hóa thành vô nghĩa.</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Source Code / Configuration Management.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#ff8c00; border-color:#ff8c00; background:rgba(255,140,0,0.1);">
+                            <i class="fa-solid fa-sync me-1"></i> Xoay vòng khóa động (Dynamic Rotation)
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">Quản Lý Khóa (Key Mgt)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card threat-card threat-sqli h-100 p-3">
+                    <h5 class="fw-bold" style="color: #4af626;"><i class="fa-solid fa-syringe me-2"></i>6. Mũi Tiêm Tử Thần (SQL Injection)</h5>
+                    <p class="text-muted small mb-2"><strong>Mục tiêu:</strong> Chèn mã SQL độc hại (như <code>' OR 1=1</code>) vào ô nhập liệu để bẻ gãy cấu trúc truy vấn, hòng đánh cắp dữ liệu VIP hoặc xóa sạch ngân hàng.</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Database Layer / User Input Validation.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary">
+                        <span class="d-block text-light small mb-1">Cơ Chế Phòng Thủ:</span>
+                        <span class="defense-badge" style="color:#4af626; border-color:#4af626; background:rgba(74,246,38,0.1);">
+                            <i class="fa-solid fa-code me-1"></i> LINQ Parameterization (EF Core)
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-1">An Toàn CSDL (Database)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-2">
+                <div class="card threat-card threat-ddos h-100 p-3 text-center">
+                    <h5 class="fw-bold" style="color: #ff00ff; font-size: 1.5rem;"><i class="fa-solid fa-network-wired me-2"></i>7. Từ Chối Dịch Vụ Thuật Toán (Cryptographic DDoS)</h5>
+                    <p class="text-muted small mb-2 mx-auto" style="max-width: 800px;"><strong>Mục tiêu:</strong> Dùng mạng máy tính ma (Botnet) dội bom hàng triệu request chứa chữ ký rác nhằm vắt kiệt tài nguyên CPU/RAM để giải mã thuật toán nặng, gây sập toàn bộ Server.</p>
+                    <p class="text-muted small mb-3"><strong>Bề mặt tấn công:</strong> Application Gateway / Resource Exhaustion.</p>
+                    <div class="mt-auto pt-3 border-top border-secondary d-flex justify-content-center align-items-center">
+                        <span class="text-light small me-3">Cơ Chế Phòng Thủ Tối Thượng:</span>
+                        <span class="defense-badge fs-6 px-3 py-2" style="color:#ff00ff; border-color:#ff00ff; background:rgba(255,0,255,0.1);">
+                            <i class="fa-solid fa-filter me-2"></i> Rate Limiting Middleware
+                        </span>
+                        <span class="badge bg-dark border border-secondary text-secondary ms-3 fs-6">Tính Sẵn Sàng (Availability)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-4 text-center" style="z-index: 1; position: relative;">
+            <p class="text-success font-monospace mb-0 fs-5"><i class="fa-solid fa-check-double me-2"></i> HỆ THỐNG PHÒNG THỦ ĐA TẦNG (DEFENSE IN DEPTH) ĐÃ ĐƯỢC THIẾT LẬP HOÀN CHỈNH</p>
+        </div>
+    </div>
+</div>

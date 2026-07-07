@@ -1,0 +1,314 @@
+﻿@model Uzuki_CyberBank.ViewModels.Level4ViewModel
+@{
+    ViewData["Title"] = "Level 4 - The Cryptographic Vault";
+}
+
+<style>
+    /* HIỆU ỨNG ĐỒ HỌA ĐỘC QUYỀN CHO MÀN BOSS */
+    .vault-container {
+        background: radial-gradient(circle at center, #1f1f2e 0%, #0b0c10 100%);
+        border: 2px solid #ff003c;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .invoice-box {
+        background: rgba(0, 243, 255, 0.05);
+        border: 1px dashed #00f3ff;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* Hiệu ứng con dấu TỪ CHỐI */
+    .denied-stamp {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(3) rotate(-15deg);
+        color: #ff003c;
+        font-size: 3.5rem;
+        font-weight: 900;
+        font-family: 'Orbitron', sans-serif;
+        border: 8px solid #ff003c;
+        padding: 10px 30px;
+        border-radius: 10px;
+        text-shadow: 0 0 20px rgba(255,0,60,0.8);
+        box-shadow: inset 0 0 20px rgba(255,0,60,0.5), 0 0 20px rgba(255,0,60,0.5);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 100;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+        .denied-stamp.show {
+            transform: translate(-50%, -50%) scale(1) rotate(-15deg);
+            opacity: 1;
+        }
+
+    /* Khắc phục lỗi Razor bằng @@ */
+    @@keyframes shake {
+        0% {
+            transform: translate(1px, 1px) rotate(0deg);
+        }
+
+        10% {
+            transform: translate(-1px, -2px) rotate(-1deg);
+        }
+
+        20% {
+            transform: translate(-3px, 0px) rotate(1deg);
+        }
+
+        30% {
+            transform: translate(3px, 2px) rotate(0deg);
+        }
+
+        40% {
+            transform: translate(1px, -1px) rotate(1deg);
+        }
+
+        50% {
+            transform: translate(-1px, 2px) rotate(-1deg);
+        }
+
+        60% {
+            transform: translate(-3px, 1px) rotate(0deg);
+        }
+
+        70% {
+            transform: translate(3px, 1px) rotate(-1deg);
+        }
+
+        80% {
+            transform: translate(-1px, -1px) rotate(1deg);
+        }
+
+        90% {
+            transform: translate(1px, 2px) rotate(0deg);
+        }
+
+        100% {
+            transform: translate(1px, -2px) rotate(-1deg);
+        }
+    }
+
+    .shake-active {
+        animation: shake 0.5s;
+        animation-iteration-count: 1;
+    }
+
+    /* Terminal Console */
+    .rsa-console {
+        background: #050505;
+        border: 1px solid #4af626;
+        color: #4af626;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.85rem;
+        height: 160px;
+        overflow-y: auto;
+        padding: 10px;
+        display: none;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-danger pb-2">
+        <h2 class="text-danger" style="font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(255,0,60,0.5);">
+            <i class="fa-solid fa-skull-crossbones me-2"></i> LEVEL 4: THE CRYPTOGRAPHIC VAULT
+        </h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">TẨU THOÁT</a>
+    </div>
+
+    <div id="dynamicAlert" class="alert bg-transparent shadow-sm mb-4" style="display: none; border-width: 1px; border-style: solid;">
+        <h5 id="alertTitle" class="fw-bold"></h5>
+        <p id="alertDesc" class="mb-0 small"></p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="vault-container p-4 shadow-lg mb-4" id="vaultBox">
+
+                <div class="denied-stamp" id="stampDenied">ACCESS DENIED</div>
+
+                <div class="text-center mb-4">
+                    <h5 class="text-light"><i class="fa-solid fa-fingerprint text-danger me-2"></i>MODULE XÁC THỰC MẠO DANH</h5>
+                    <p class="text-muted small">Mô phỏng máy quét an ninh RSA-PSS 2048-bit của hệ thống.</p>
+                </div>
+
+                <div class="invoice-box mb-4">
+                    <div class="text-info fw-bold border-bottom border-info pb-1 mb-2">
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i> PAYLOAD: LỆNH CHUYỂN TIỀN KHẨN CẤP
+                    </div>
+                    <div class="text-light" id="payloadData" style="word-break: break-all;">
+                        @Model.ForgedPayload
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-info small fw-bold"><i class="fa-solid fa-key me-1"></i> Public Key của Giám Đốc</label>
+                    <input type="text" id="publicKey" class="form-control bg-dark text-info font-monospace form-control-sm" value="@Model.PublicKey" readonly disabled />
+                </div>
+
+                <div class="mb-4 position-relative">
+                    <label class="form-label text-danger small fw-bold"><i class="fa-solid fa-signature me-1"></i> Chữ Ký Số (Hacker giả mạo)</label>
+                    <textarea id="forgedSignature" class="form-control bg-dark text-danger font-monospace border-danger" rows="3">@Model.ForgedSignature</textarea>
+                </div>
+
+                <div class="rsa-console mb-3 shadow-sm" id="rsaConsoleBox">
+                    <div id="rsaConsoleContent"></div>
+                </div>
+
+                <button id="btnActivateRSA" class="cyber-btn w-100 py-3 fs-5 fw-bold" style="border-color: #ff003c; color: #ff003c; box-shadow: inset 0 0 15px rgba(255,0,60,0.3);">
+                    <i class="fa-solid fa-microchip me-2"></i> KÍCH HOẠT HỆ THỐNG QUÉT RSA-PSS
+                </button>
+
+                <a href="/Game/PlayLevel?levelId=5" id="btnNextLevel" class="cyber-btn w-100 mt-2 text-center py-3 fs-6 fw-bold" style="border-color: #4af626; color: #4af626; display: none; box-shadow: inset 0 0 15px rgba(74, 246, 38, 0.2);">
+                    <i class="fa-solid fa-shield-check me-2"></i> KẺ MẠO DANH BỊ TIÊU DIỆT - TIẾN VÀO LEVEL 5 <i class="fa-solid fa-forward ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning bg-dark h-100 text-light">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>TÀI LIỆU HỌC THUẬT & KIẾN TRÚC
+                </div>
+                <div class="card-body overflow-auto" style="max-height: 700px;">
+                    <h6 class="text-danger fw-bold">1. Kịch bản Kẻ mạo danh (Forgery Attack)</h6>
+                    <p class="small text-muted text-justify">
+                        Không giống Level 2 (Sửa đổi) hay Level 3 (Phát lại), ở mức độ này, Hacker chủ động tự tạo ra một giao dịch hoàn toàn mới (Chuyển 1.000.000$ vào túi hắn). Để Server tin đây là lệnh từ Giám đốc, hắn bắt buộc phải giả mạo <strong>Chữ ký số (Digital Signature)</strong> đính kèm theo gói tin.
+                    </p>
+
+                    <h6 class="text-info fw-bold mt-4">2. Bức Tường Thép: RSA-PSS 2048-bit</h6>
+                    <p class="small text-muted text-justify">
+                        Hệ thống sử dụng thuật toán Mã hóa Bất đối xứng RSA (Rivest–Shamir–Adleman) kết hợp với chuẩn đệm PSS (Probabilistic Signature Scheme) tiên tiến nhất để xác thực danh tính:
+                    </p>
+                    <ul class="small text-muted text-justify mb-3">
+                        <li><strong>Khi tạo chữ ký:</strong> Giám đốc dùng <code>Private Key</code> (chỉ mình ông ấy giữ) để ký duyệt gói tin.</li>
+                        <li><strong>Khi kiểm tra:</strong> Server (và bất kỳ ai) đều có thể dùng <code>Public Key</code> của Giám đốc để xác minh xem chữ ký đó có đúng là do Private Key kia tạo ra hay không.</li>
+                    </ul>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-fingerprint text-info me-1"></i> <strong>Cơ chế chốt chặn tại Server:</strong>
+                        <br />Khi Hacker đính kèm chữ ký giả mạo (vì hắn không có Private Key), hàm <code>VerifySignature()</code> của Server sẽ chạy thuật toán đối chiếu Hash. Nó sẽ nhận ra chữ ký này và gói tin không hề ăn khớp với Public Key. Lập tức, giao dịch bị đóng dấu <strong>TỪ CHỐI (ACCESS DENIED)</strong>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    $('#btnActivateRSA').click(function () {
+
+    // 1. Khóa nút bấm và lấy dữ liệu
+    let btn = $(this);
+    btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> ĐANG XỬ LÝ...');
+
+    let payload = $('#payloadData').text().trim();
+    let signature = $('#forgedSignature').val().trim();
+    let pubKey = $('#publicKey').val().trim();
+
+    let consoleBox = $('#rsaConsoleBox');
+    let consoleContent = $('#rsaConsoleContent');
+    consoleContent.empty();
+    consoleBox.slideDown();
+
+    // 2. Gửi AJAX ngầm đi trước
+    let ajaxResult = null;
+    $.post('/Game/FireAjaxLevel4', {
+    forgedPayload: payload,
+    forgedSignature: signature,
+    publicKey: pubKey
+    }, function (response) {
+    ajaxResult = response;
+    });
+
+    // 3. KỊCH BẢN HIỆU ỨNG HỒI HỘP
+    const printLog = (text, className = "text-success") => {
+    let time = new Date().toISOString().substring(11, 23);
+    consoleContent.append(`<div class="${className} mb-1">> [${time}] ${text}</div>`);
+    consoleBox.scrollTop(consoleBox[0].scrollHeight);
+    };
+
+    const playBeep = () => {
+    let sfx = document.getElementById('clickAudio');
+    if(sfx) { sfx.currentTime = 0; sfx.play(); }
+    };
+
+    setTimeout(() => { printLog("Khởi động module mật mã RSA-PSS 2048-bit...", "text-info"); }, 0);
+
+    setTimeout(() => {
+    printLog("Đang nạp Public Key của Giám đốc... [OK]");
+    playBeep();
+    }, 1000);
+
+    setTimeout(() => {
+    printLog("Đang dùng Public Key để giải mã khối Chữ ký số... [OK]");
+    playBeep();
+    }, 2000);
+
+    setTimeout(() => {
+    printLog("Đang tính toán và đối chiếu mã Hash của Payload... [ĐANG XỬ LÝ]", "text-warning");
+    }, 3000);
+
+    // Giây thứ 4: Bung kết quả
+    setTimeout(() => {
+    if (ajaxResult && ajaxResult.code === 403) {
+
+    // KỊCH BẢN 1: BỊ CHẶN (Bình thường)
+    printLog("MÃ HASH KHÔNG KHỚP! CHỮ KÝ BỊ LÀM GIẢ!", "text-danger fw-bold");
+
+    // Rung màn hình và hú còi
+    $('#vaultBox').addClass('shake-active');
+    setTimeout(() => $('#vaultBox').removeClass('shake-active'), 500);
+
+    let alarm = document.getElementById('alarmAudio');
+    if(alarm) { alarm.volume = 0.8; alarm.currentTime = 0; alarm.play(); }
+
+    // Đóng mộc TỪ CHỐI
+    $('#stampDenied').addClass('show');
+
+    // Hiện Banner thông báo thành công màu xanh
+    $('#dynamicAlert')
+    .removeClass('alert-danger border-danger text-danger')
+    .addClass('alert-success border-success text-success')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-shield-check me-2"></i>BẢO VỆ HỆ THỐNG THÀNH CÔNG');
+    $('#alertDesc').text('Máy quét RSA đã từ chối lệnh mạo danh. Kẻ gian không thể qua mặt thuật toán khi không có Private Key.');
+
+    // Chờ 2.5 giây cho người dùng xem mộc đỏ, sau đó thay đổi nút bấm
+    setTimeout(() => {
+    let successMusic = document.getElementById('successAudio');
+    if(successMusic) { successMusic.volume = 0.8; successMusic.play(); }
+
+    // Ẩn nút quét, Hiện nút sang Level 5
+    btn.hide();
+    $('#btnNextLevel').fadeIn();
+
+    }, 2500);
+
+    } else {
+
+    // KỊCH BẢN 2: HACKER THÀNH CÔNG (Nếu nhập đúng Private Key)
+    printLog("XÁC THỰC THÀNH CÔNG. Giao dịch hợp lệ.", "text-success");
+
+    // Hiện Banner Thảm họa màu đỏ
+    $('#dynamicAlert')
+    .removeClass('alert-success border-success text-success')
+    .addClass('alert-danger border-danger text-danger')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-radiation me-2"></i>THẢM HỌA XẢY RA');
+    $('#alertDesc').text('Hacker đã nhập đúng Chữ ký số! Hệ thống bị lừa và 1.000.000$ đã bị chuyển đi. Khóa bảo mật đã bị rò rỉ!');
+
+    btn.prop('disabled', false).html('<i class="fa-solid fa-microchip me-2"></i> THỬ LẠI');
+    }
+    }, 4500);
+    });
+    });
+</script>

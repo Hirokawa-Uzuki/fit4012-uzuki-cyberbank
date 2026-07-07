@@ -1,0 +1,156 @@
+﻿@model Uzuki_CyberBank.ViewModels.Level3ViewModel
+@{
+    ViewData["Title"] = "Level 3 - Interactive Replay Attack";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-purple pb-2" style="border-color: #bc13fe !important;">
+        <h2 style="color: #bc13fe; font-family: 'Orbitron', sans-serif;"><i class="fa-solid fa-clone me-2"></i>LEVEL 3: TẤN CÔNG PHÁT LẠI (INTERACTIVE)</h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Rời khỏi
+        </a>
+    </div>
+
+    <div id="dynamicAlert" class="alert bg-transparent shadow-sm mb-4" style="display: none; border-width: 1px; border-style: solid;">
+        <h5 id="alertTitle"></h5>
+        <p id="alertDesc" class="mb-0 small"></p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+
+            <div class="card mb-4 shadow-lg" style="border-color: #bc13fe; background: rgba(11,12,16,0.9);">
+                <div class="card-header bg-transparent fw-bold" style="color: #bc13fe; border-bottom: 1px solid #bc13fe;">
+                    <i class="fa-solid fa-satellite-dish me-2"></i>ATTACK SIMULATOR (CÔNG CỤ GIẢ LẬP)
+                </div>
+                <div class="card-body">
+                    <p class="text-light small mb-3">
+                        <strong>HƯỚNG DẪN DEMO:</strong> Bấm gửi gói tin lần đầu tiên để Server xử lý. Sau đó, hóa thân thành Hacker và bấm nút GỬI điên cuồng để xem hệ thống chống Replay Attack phản ứng ra sao!
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-info small fw-bold">Chuỗi định danh duy nhất (Nonce)</label>
+                        <input type="text" id="simNonce" class="form-control bg-dark text-warning font-monospace" value="@Model.Nonce" readonly />
+                    </div>
+
+                    <button id="btnSpamAttack" class="cyber-btn w-100 py-3 fs-5 mt-2" style="border-color: #bc13fe; color: #bc13fe; box-shadow: inset 0 0 10px rgba(188,19,254,0.3);">
+                        <i class="fa-solid fa-paper-plane me-2"></i> FIRE PAYLOAD (GỬI GÓI TIN)
+                    </button>
+
+                    <a href="/Game/PlayLevel?levelId=4" id="btnNextLevel" class="cyber-btn w-100 mt-4 text-center py-2" style="border-color: #4af626; color: #4af626; display: none;">
+                        HỆ THỐNG ĐÃ AN TOÀN - TIẾN VÀO LEVEL 4 <i class="fa-solid fa-forward ms-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-info mb-4" style="background: #050505;">
+                <div class="card-header bg-dark border-info text-info fw-bold d-flex justify-content-between py-2">
+                    <span class="small"><i class="fa-solid fa-terminal me-2"></i>SERVER LIVE LOGS</span>
+                    <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+                </div>
+                <div class="card-body p-2" id="serverConsole" style="height: 250px; overflow-y: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.85rem;">
+                    <div class="text-muted mb-2">> Hệ thống sẵn sàng lắng nghe request...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning h-100">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-book-journal-whills me-2"></i>PHÂN TÍCH KIẾN TRÚC HỆ THỐNG
+                </div>
+                <div class="card-body text-light overflow-auto" style="max-height: 600px;">
+                    <h6 class="text-info fw-bold">1. Điểm mù của Mã hóa (Encryption Blind Spot)</h6>
+                    <p class="small text-muted text-justify">
+                        Một sai lầm phổ biến trong thiết kế mạng là lầm tưởng rằng chỉ cần mã hóa dữ liệu là đủ an toàn. Kịch bản <strong>Tấn công phát lại (Replay Attack)</strong> khai thác trực tiếp vào lỗ hổng logic này.
+                        <br />
+                        Hacker không cần biết khóa bí mật, cũng không cần giải mã gói tin. Hắn chỉ việc "sao chép" gói tin hợp lệ và gửi lại (resend) nó cho Server. Nếu Server thiết kế không có "trí nhớ", nó sẽ ngoan ngoãn giải mã và thực thi lệnh trừ tiền nhiều lần.
+                    </p>
+
+                    <h6 class="text-info fw-bold mt-4">2. Tính Lũy Đẳng (Idempotency) và Biến Nonce</h6>
+                    <p class="small text-muted mb-1 text-justify">
+                        Để xây dựng một Core Banking chuẩn, hệ thống phải đảm bảo <strong>Tính lũy đẳng (Idempotency)</strong> - tức là một giao dịch dù có gửi lên hệ thống bao nhiêu lần, thì kết quả thực thi cuối cùng vẫn chỉ xảy ra đúng 1 lần.
+                    </p>
+                    <p class="small text-muted text-justify">
+                        Giải pháp được áp dụng là sử dụng <strong>Nonce (Number Used Once)</strong>. Đây là một chuỗi ngẫu nhiên chỉ sinh ra một lần duy nhất cho mỗi giao dịch.
+                    </p>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-database text-warning me-1"></i> <strong>Quy trình xử lý tại Database:</strong>
+                        <br />Khi Server nhận được giao dịch lần đầu, nó trích xuất <code>Nonce</code> và lưu trực tiếp vào bảng <code>SimulatedTransactions</code> trên SQL Server.
+                        <br /><br />
+                        Ở các Request tiếp theo, hệ thống truy vấn DB: <em>"Mã Nonce này đã tồn tại chưa?"</em>. Nếu lệnh <code>AnyAsync()</code> trả về True, Server biết ngay đây là Replay Attack và lập tức vứt bỏ request.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    let clickCount = 0;
+
+    $('#btnSpamAttack').click(function () {
+    // Lấy giá trị Nonce từ ô Input
+    let currentNonce = $('#simNonce').val();
+    let consoleBox = $('#serverConsole');
+    let timestamp = new Date().toISOString().substring(11, 23);
+
+    // Gửi Request ngầm lên Controller
+    $.post('/Game/FireAjaxReplay', { nonce: currentNonce }, function (response) {
+    clickCount++;
+    let logLine = "";
+
+    if (response.code === 200) {
+    // --- LẦN GỬI ĐẦU TIÊN: HỢP LỆ ---
+
+    // Cập nhật Banner Giải thích thành màu XANH
+    $('#dynamicAlert')
+    .removeClass('alert-danger border-danger text-danger')
+    .addClass('alert-success border-success text-success')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-check-circle me-2"></i>GIAO DỊCH LẦN ĐẦU HỢP LỆ');
+    $('#alertDesc').text('Hệ thống đã xử lý gói tin và lưu mã Nonce vào cơ sở dữ liệu để làm bằng chứng.');
+
+    // In log ra Terminal
+    logLine = `<div class="text-success mb-2">> [${timestamp}] ${response.message}</div>`;
+
+    // SFX: Tiếng bíp thành công
+    let sfx = document.getElementById('successAudio');
+    if(sfx) { sfx.volume = 0.5; sfx.play(); }
+    }
+    else if (response.code === 403) {
+    // --- TỪ LẦN GỬI THỨ 2 TRỞ ĐI: BỊ CHẶN ---
+
+    // Cập nhật Banner Giải thích thành màu ĐỎ
+    $('#dynamicAlert')
+    .removeClass('alert-success border-success text-success')
+    .addClass('alert-danger border-danger text-danger')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-shield-halved me-2"></i>PHÁT HIỆN REPLAY ATTACK!');
+    $('#alertDesc').text('Tuyệt vời! Việc lưu vết Nonce vào SQL Server đã giúp hệ thống có "trí nhớ" và vứt bỏ thành công gói tin spam của Hacker.');
+
+    // In log ra Terminal
+    logLine = `<div class="text-danger mb-2 fw-bold" style="text-shadow: 0 0 5px red;">> [${timestamp}] ${response.message}</div>`;
+
+    // SFX: Phát còi báo động và rung màn hình
+    let alarm = document.getElementById('alarmAudio');
+    if(alarm) { alarm.volume = 0.8; alarm.currentTime = 0; alarm.play(); }
+
+    $('body').addClass('bg-danger');
+    setTimeout(() => $('body').removeClass('bg-danger'), 200);
+
+    // Hiện nút chuyển màn
+    $('#btnNextLevel').fadeIn();
+    }
+
+    // Append log và tự động cuộn Terminal xuống dưới cùng
+    consoleBox.append(logLine);
+    consoleBox.scrollTop(consoleBox[0].scrollHeight);
+    });
+    });
+    });
+</script>

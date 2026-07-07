@@ -1,0 +1,193 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Level 6 - SQL Injection Shield";
+}
+
+<style>
+    /* Hiệu ứng Khiên bảo vệ CSDL */
+    .db-monitor-box {
+        background: #070a0e;
+        border: 1px solid #00f3ff;
+        border-radius: 10px;
+        box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.2);
+    }
+
+    .shield-status {
+        padding: 15px;
+        border-radius: 5px;
+        font-family: 'Orbitron', sans-serif;
+        text-align: center;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .shield-active {
+        background: rgba(0, 243, 255, 0.1);
+        color: #00f3ff;
+        border: 1px solid #00f3ff;
+        animation: shieldPulse 2s infinite;
+    }
+
+    /* Khắc phục lỗi Razor View bằng cách dùng hai dấu @@ */
+    @@keyframes shieldPulse {
+        0% {
+            box-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+        }
+
+        100% {
+            box-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+        }
+    }
+
+    /* Bảng hiển thị kết quả truy vấn rỗng */
+    .result-grid {
+        background: #020202;
+        border: 1px solid #333;
+        font-family: monospace;
+        color: #888;
+        min-height: 100px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-info pb-2" style="border-color: #00f3ff !important;">
+        <h2 style="color: #00f3ff; font-family: 'Orbitron', sans-serif;">
+            <i class="fa-solid fa-database me-2"></i> LEVEL 6: TẤN CÔNG CẤU TRÚC DỮ LIỆU (SQL INJECTION)
+        </h2>
+        <a asp-controller="Home" asp-action="Index" class="cyber-btn cyber-btn-danger btn-sm">RỜI KHỎI</a>
+    </div>
+
+    <div id="dynamicAlert" class="alert bg-transparent shadow-sm mb-4" style="display: none; border-width: 1px; border-style: solid;">
+        <h5 id="alertTitle"></h5>
+        <p id="alertDesc" class="mb-0 small"></p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="card mb-4 db-monitor-box text-light">
+                <div class="card-header bg-dark border-info text-info fw-bold d-flex justify-content-between align-items-center">
+                    <span><i class="fa-solid fa-shield-halved me-2"></i>DATABASE FIREWALL INTERFACE</span>
+                    <span class="badge bg-info text-dark">EF CORE PASSIVE</span>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-4">
+                        <strong>HƯỚNG DẪN DEMO:</strong> Hãy nhập một chuỗi phá hoại dữ liệu kinh điển của Hacker (Ví dụ: <code class="text-danger">' OR '1'='1</code> hoặc <code class="text-danger">'; DROP TABLE Users; --</code>) vào ô tìm kiếm tài khoản dưới đây để kiểm tra sức mạnh của hệ thống.
+                    </p>
+
+                    <div class="mb-4">
+                        <label class="form-label text-warning small fw-bold"><i class="fa-solid fa-terminal me-1"></i> Nhập chuỗi truy vấn độc hại (SQL Payload)</label>
+                        <div class="input-group">
+                            <input type="text" id="maliciousInput" class="form-control bg-dark text-danger font-monospace border-secondary" value="' OR '1'='1" placeholder="Nhập câu lệnh SQL Injection..." />
+                            <button class="btn btn-outline-info" type="button" id="btnInjectAttack">
+                                <i class="fa-solid fa-bolt me-1"></i> THỰC THI LINQ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="shield-status shield-active" id="shieldVisual">
+                            <i class="fa-solid fa-microchip me-2"></i> CƠ CHẾ PARAMETERIZATION ĐANG KHỞI CHẠY
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label text-secondary small">KẾT QUẢ ĐẦU RA TỪ SQL SERVER (QUERY OUTPUT)</label>
+                        <div class="result-grid rounded p-3 d-flex flex-column justify-content-center align-items-center" id="queryResultBox">
+                            <div class="text-muted" id="gridContent">> Chưa có truy vấn nào được thực thi.</div>
+                        </div>
+                    </div>
+
+                    <a href="/Game/PlayLevel?levelId=7" id="btnNextLevel" class="cyber-btn w-100 mt-3 text-center py-2" style="border-color: #4af626; color: #4af626; display: none;">
+                        CSDL AN TOÀN TUYỆT ĐỐI - TIẾN VÀO TRẬN CHUNG KẾT (LEVEL 7) <i class="fa-solid fa-skull ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-warning bg-dark h-100 text-light">
+                <div class="card-header bg-transparent border-warning text-warning fw-bold">
+                    <i class="fa-solid fa-book me-2"></i>TÀI LIỆU HỌC THUẬT (CWE-89)
+                </div>
+                <div class="card-body overflow-auto" style="max-height: 550px;">
+                    <h6 class="text-info fw-bold">1. Hiểm họa từ SQL Injection (CWE-89)</h6>
+                    <p class="small text-muted text-justify">
+                        SQL Injection là một trong những lỗ hổng nguy hiểm nhất mọi thời đại trong kiến trúc web. Lỗ hổng xảy ra khi lập trình viên thô sơ cộng chuỗi đầu vào của người dùng trực tiếp vào câu lệnh SQL (Ví dụ: <code>"SELECT * FROM Users WHERE Name = '" + input + "'"</code>). Hacker có thể chèn các ký tự điều khiển cấu trúc để thay đổi bản chất toán học của truy vấn, tước quyền quản trị hoặc xóa sạch CSDL.
+                    </p>
+
+                    <h6 class="text-info fw-bold mt-4">2. Bức tường thép: LINQ Parameterization</h6>
+                    <p class="small text-muted text-justify">
+                        Trong đồ án của Nhóm 15, chúng em sử dụng <strong>Entity Framework Core</strong> làm tầng tương tác dữ liệu (ORM). Bản chất khi thực thi hàm LINQ:
+                        <br /><code class="text-warning">.Where(b => b.AccountName == maliciousInput)</code>
+                    </p>
+                    <p class="small text-muted text-justify">
+                        EF Core sẽ không bao giờ cộng chuỗi. Nó tự động biên dịch câu lệnh thành cấu trúc có tham số <code>@@p0</code> và đẩy chuỗi của hacker vào vị trí tham số đó dưới dạng một văn bản thuần túy (String Literal).
+                    </p>
+
+                    <div class="alert alert-dark border-secondary mt-3 p-3 small text-justify shadow-sm">
+                        <i class="fa-solid fa-check-double text-success me-1"></i> <strong>Kết quả thực tế:</strong>
+                        <br />Khi hacker nhập câu lệnh hủy diệt <code>'; DROP TABLE...</code>, SQL Server chỉ đơn thuần hiểu rằng hệ thống đang đi tìm một tài khoản có cái tên quái dị chứa toàn dấu nháy và dấu chấm phẩy đó. Do không tìm thấy ai trùng khớp, DB trả về 0 kết quả, loại bỏ hoàn toàn khả năng thực thi mã độc.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+    $('#btnInjectAttack').click(function () {
+    let inputPayload = $('#maliciousInput').val().trim();
+    let resultBox = $('#queryResultBox');
+    let gridContent = $('#gridContent');
+    let successAudio = document.getElementById('successAudio');
+
+    if (inputPayload === "") return;
+
+    // Bật hiệu ứng quét nhấp nháy mạnh hơn khi nhấn nút
+    $('#shieldVisual').html('<i class="fa-solid fa-shield-halved fa-spin me-2"></i> ĐANG THẨM ĐỊNH VÀ THAM SỐ HÓA CHUỖI TRUY VẤN...');
+
+    // Gửi dữ liệu tấn công lên Server qua API AJAX
+    $.post('/Game/FireAjaxLevel6', { maliciousInput: inputPayload }, function (response) {
+
+    // Trì hoãn nhẹ 800ms để tạo cảm giác hệ thống đang tính toán bộ lọc
+    setTimeout(() => {
+
+    // 1. Cập nhật Banner Giải thích màu Xanh lá
+    $('#dynamicAlert')
+    .removeClass('alert-danger border-danger text-danger')
+    .addClass('alert-success border-success text-success')
+    .slideDown();
+    $('#alertTitle').html('<i class="fa-solid fa-user-shield me-2"></i>SHIELD VERDICT: AN TOÀN');
+    $('#alertDesc').text(response.message);
+
+    // 2. Trả trạng thái bộ lọc về bình thường
+    $('#shieldVisual').html('<i class="fa-solid fa-circle-check text-success me-2"></i>HỆ THỐNG AN TOÀN - MIỄN NHIỄM VỚI CHUỖI ĐÃ NHẬP');
+
+    // 3. Vẽ cấu trúc lưới dữ liệu rỗng lên màn hình kết quả để chứng minh
+    let time = new Date().toISOString().substring(11, 19);
+    gridContent.html(`
+    <div class="text-success fw-bold w-100 text-start">[${time}] > SQL Server đã thực thi câu lệnh tham số hóa thành công.</div>
+    <div class="text-info w-100 text-start mt-1">> Rows Returned: ${response.resultsFound} (Không tìm thấy bản ghi nào khớp với chuỗi văn bản độc hại).</div>
+    <div class="text-muted small w-100 text-start mt-2">> [STATUS] CSDL nguyên vẹn 100%. Tiến trình tấn công bị bẻ gãy hoàn toàn.</div>
+    `);
+
+    resultBox.css('border-color', '#4af626');
+
+    // 4. Hiện nút tiến tới Trận chiến cuối cùng (Level 7)
+    $('#btnInjectAttack').hide();
+    $('#btnNextLevel').fadeIn();
+
+    // Phát nhạc Ting ting phá đảo màn chơi
+    if(successAudio) { successAudio.volume = 0.6; successAudio.play(); }
+
+    }, 800);
+    });
+    });
+    });
+</script>

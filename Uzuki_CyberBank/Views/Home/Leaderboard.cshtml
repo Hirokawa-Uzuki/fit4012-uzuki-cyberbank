@@ -1,0 +1,175 @@
+﻿@model IEnumerable<Uzuki_CyberBank.Models.User>
+@{
+    ViewData["Title"] = "Leaderboard - Bảng Xếp Hạng";
+    int rank = 1; // Biến đếm thứ hạng
+}
+
+<style>
+    .leaderboard-container {
+        background: rgba(11, 12, 16, 0.85);
+        border: 1px solid #ffd700;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        padding: 30px;
+    }
+
+    /* Thiết kế bảng vinh danh */
+    .cyber-table {
+        width: 100%;
+        color: #c5c6c7;
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Tạo khoảng cách giữa các hàng */
+    }
+
+        .cyber-table th {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            color: #ffd700;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .cyber-table tr {
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+            .cyber-table tr:hover {
+                transform: scale(1.02);
+                background: rgba(255, 215, 0, 0.1);
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            }
+
+        .cyber-table td {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+            /* Bo góc cho hàng */
+            .cyber-table td:first-child {
+                border-left: 1px solid rgba(255,255,255,0.05);
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+
+            .cyber-table td:last-child {
+                border-right: 1px solid rgba(255,255,255,0.05);
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+
+    /* Hiệu ứng màu sắc cho TOP 3 */
+    .rank-1 {
+        color: #ffd700;
+        font-weight: 900;
+        font-size: 1.3rem;
+        text-shadow: 0 0 10px #ffd700;
+    }
+    /* Vàng */
+    .rank-2 {
+        color: #c0c0c0;
+        font-weight: bold;
+        font-size: 1.2rem;
+        text-shadow: 0 0 10px #c0c0c0;
+    }
+    /* Bạc */
+    .rank-3 {
+        color: #cd7f32;
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px #cd7f32;
+    }
+    /* Đồng */
+    .rank-normal {
+        color: #00f3ff;
+        font-weight: bold;
+    }
+
+    .score-badge {
+        background: transparent;
+        border: 1px solid #00f3ff;
+        color: #00f3ff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-family: 'Orbitron', sans-serif;
+        box-shadow: inset 0 0 8px rgba(0,243,255,0.3);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="leaderboard-container mx-auto" style="max-width: 900px;">
+        <div class="text-center mb-5">
+            <h1 style="color: #ffd700; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px #ffd700;">
+                <i class="fa-solid fa-trophy me-2"></i> HALL OF FAME
+            </h1>
+            <p class="text-muted font-monospace mt-2">UZUKI CYBERBANK - BẢNG PHONG THẦN NHÓM 16</p>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="cyber-table text-center">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;"># XẾP HẠNG</th>
+                            <th class="text-start" style="width: 45%;">CHUYÊN GIA BẢO MẬT</th>
+                            <th style="width: 20%;">CẤP ĐỘ</th>
+                            <th style="width: 20%;">ĐIỂM SỐ (KP)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            // Tùy chỉnh CSS dựa trên thứ hạng
+                            string rankClass = rank == 1 ? "rank-1" : rank == 2 ? "rank-2" : rank == 3 ? "rank-3" : "rank-normal";
+                            string icon = rank == 1 ? "<i class='fa-solid fa-crown'></i>" : rank == 2 ? "<i class='fa-solid fa-medal'></i>" : rank == 3 ? "<i class='fa-solid fa-award'></i>" : $"#{rank}";
+
+                            <tr>
+                                <td class="@rankClass">@Html.Raw(icon)</td>
+                                <td class="text-start">
+                                    <span class="@rankClass" style="font-family: 'Rajdhani', sans-serif; font-size: 1.2rem;">
+                                        @user.Username
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-dark border border-secondary text-light">Level @user.CurrentLevel</span>
+                                </td>
+                                <td>
+                                    <span class="score-badge">@user.Score</span>
+                                </td>
+                            </tr>
+                            rank++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-dark border-warning text-warning text-center p-4">
+                <i class="fa-solid fa-triangle-exclamation fs-3 mb-2 d-block"></i>
+                Hệ thống chưa ghi nhận bất kỳ chuyên gia bảo mật nào. Hãy là người đầu tiên phá đảo!
+            </div>
+        }
+
+        <div class="text-center mt-5">
+            <a asp-controller="Home" asp-action="Index" class="cyber-btn" style="border-color: #ffd700; color: #ffd700;">
+                <i class="fa-solid fa-house-chimney me-2"></i> QUAY VỀ BASE
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Thêm tiếng Ting Ting khi người dùng mở bảng xếp hạng
+    document.addEventListener("DOMContentLoaded", function() {
+        let sfx = document.getElementById('successAudio');
+        if (sfx && localStorage.getItem('uzuki_muted') !== 'true') {
+            sfx.volume = 0.5;
+            sfx.play();
+        }
+    });
+</script>

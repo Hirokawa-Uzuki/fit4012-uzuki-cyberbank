@@ -1,0 +1,121 @@
+﻿@model IEnumerable<Uzuki_CyberBank.ViewModels.AuditLogViewModel>
+@{
+    ViewData["Title"] = "System Audit Logs";
+}
+
+<style>
+    .terminal-container {
+        background-color: #050505;
+        border: 1px solid #00f3ff;
+        border-radius: 5px;
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        height: 70vh;
+        overflow-y: auto;
+        padding: 20px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .log-line {
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        border-bottom: 1px dashed rgba(255,255,255,0.1);
+        padding-bottom: 5px;
+    }
+
+    .log-time {
+        color: #888;
+        margin-right: 15px;
+    }
+
+    .log-user {
+        color: #bc13fe;
+        font-weight: bold;
+        width: 120px;
+        display: inline-block;
+    }
+
+    /* Màu sắc huy hiệu (Badge) theo loại Action */
+    .badge-cyber {
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-weight: bold;
+        width: 150px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 15px;
+        font-size: 0.8rem;
+    }
+
+    .bg-info-cyber {
+        background-color: rgba(0, 243, 255, 0.2);
+        color: #00f3ff;
+        border: 1px solid #00f3ff;
+    }
+
+    .bg-success-cyber {
+        background-color: rgba(74, 246, 38, 0.2);
+        color: #4af626;
+        border: 1px solid #4af626;
+    }
+
+    .bg-danger-cyber {
+        background-color: rgba(255, 0, 60, 0.2);
+        color: #ff003c;
+        border: 1px solid #ff003c;
+    }
+
+    .bg-warning-cyber {
+        background-color: rgba(255, 215, 0, 0.2);
+        color: #ffd700;
+        border: 1px solid #ffd700;
+    }
+
+    .log-details {
+        color: #c5c6c7;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 style="color: #00f3ff; font-family: 'Orbitron', sans-serif;">
+            <i class="fa-solid fa-list-check me-2"></i> AUDIT LOGS (TRUY VẾT HỆ THỐNG)
+        </h3>
+        <div>
+            <span class="badge bg-dark border border-info text-info p-2"><i class="fa-solid fa-server me-1"></i> UZUKI_NODE_01</span>
+            <span class="badge bg-dark border border-success text-success p-2 ms-2"><i class="fa-solid fa-signal me-1"></i> ONLINE</span>
+        </div>
+    </div>
+
+    <p class="text-muted small mb-4">Ghi nhận toàn bộ hoạt động đăng nhập, mã hóa, lỗi toàn vẹn và các kịch bản đánh chặn theo chuẩn BTL FIT4012.</p>
+
+    <div class="terminal-container" id="terminalBox">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var log in Model)
+            {
+                // Logic quyết định màu sắc dựa trên ActionType
+                string badgeClass = "bg-info-cyber"; // Mặc định là màu xanh lam
+                if (log.ActionType.Contains("SUCCESS") || log.ActionType == "GAME_CLEARED") badgeClass = "bg-success-cyber";
+                else if (log.ActionType.Contains("FAIL") || log.ActionType.Contains("DETECTED")) badgeClass = "bg-danger-cyber";
+                else if (log.ActionType == "REGISTER") badgeClass = "bg-warning-cyber";
+
+                <div class="log-line">
+                    <span class="log-time">[@log.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss.fff")]</span>
+                    <span class="badge-cyber @badgeClass">@log.ActionType</span>
+                    <span class="log-user"><i class="fa-solid fa-user-astronaut me-1"></i>@log.Username</span>
+                    <span class="log-details">@log.LogDetails</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-warning"><i class="fa-solid fa-triangle-exclamation me-2"></i> SYSTEM_WARNING: Không tìm thấy dữ liệu Log.</div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Có thể thêm tiếng SFX máy tính chạy rẹt rẹt ở đây nếu thích
+    });
+</script>
